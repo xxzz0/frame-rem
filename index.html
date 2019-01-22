@@ -1,0 +1,153 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta name="format-detection" content="telephone=no, email=no" />
+    <title></title>
+    <script src="js/rem.js"></script>
+    <link rel="stylesheet" href="css/public.css?v=1.1" type="text/css" />
+</head>
+<body>
+    <div id="wrapper">
+        <div id="js_loading" class="loading"><div></div></div>
+        <div id="page_loading"><div></div><p id="loadNum">0%</p></div>
+        <!--首页-->
+        <div id="p1" class="page">
+            <div class="p1-img"><img _src="img/loading.png"/></div>
+            <div id="p1Btn" class="p1-btn">点击进入内页</div>
+        </div>
+        <div id="end" class="page">
+            <div class="end-con">
+                <h5>公司主营项目</h5>
+                <ul>
+                    <li>微信H5</li>
+                    <li>H5小游戏</li>
+                    <li>小程序</li>
+                    <li>响应式网站</li>
+                    <li>其他网站</li>
+                </ul>
+            </div>
+            <span id="return">&lt-返回首页</span>
+        </div>
+    </div>
+    <!--music Go-->
+    <div id="js_music" class="music">
+        <div>
+        </div>
+        <div style="display: none;">
+            <audio id="media" src="media/bg.mp3" loop></audio>
+        </div>
+    </div>
+    <!--music END-->
+    <!--图片预加载-->
+    <div style="display:none;">
+    </div>
+
+    <script type="text/javascript">
+        var xx = xx || {};
+        xx.cdn="";
+        ; (function () {
+            var loadSingleScript = function (src, callback,cdn) {
+                var s = document.createElement('script');
+                s.async = false;
+                if(src.indexOf('//')==-1){
+                    s.src=cdn+src;
+                }else{
+                    s.src = src;
+                };
+                
+                s.addEventListener('load', function () {
+                    s.parentNode.removeChild(s);
+                    s.removeEventListener('load', arguments.callee, false);
+                    callback();
+                }, false);
+                document.body.appendChild(s);
+            };
+            var loadScript = function (list, callback, cdn) {
+                var loaded = 0;
+                var loadNext = function () {
+                    loadSingleScript(list[loaded], function () {
+                        loaded++;
+                        if (loaded >= list.length) {
+                            callback();
+                        }
+                        else {
+                            loadNext();
+                        }
+                    },cdn)
+                };
+                loadNext();
+            };
+
+            var env = 0;//0:测试环境 1:正式环境
+            var scriptList = [
+                "js/jquery.min.js",
+                "js/public.js?v=1.0"
+            ];
+            if (env == 0) {
+                scriptList.push("test/jquery.mockjax.min.js");
+                scriptList.push("test/api.js");
+            }else if(env==1){
+                scriptList.push("//res.wx.qq.com/open/js/jweixin-1.0.0.js");
+                scriptList.push("//qiniu.bogole.com/libs/wx.js");  
+            };
+            loadScript(scriptList, main,xx.cdn);
+            function main() {
+                var imgLoader=new xx.ImgLoader();
+                imgLoader.loadType=['_src'];
+                // imgLoader.crossOrigin="anonymous";
+                imgLoader.basePath=xx.cdn;
+                var oNum = $('#loadNum')[0];
+                imgLoader.onProgress=function(plan){
+                    oNum.innerHTML=plan+"%";
+                }
+                imgLoader.onComplete=xx.main;
+                imgLoader.load();
+
+                $('#js_loading,#page_loading,#p1').on('touchmove', function (e) {
+                    e.preventDefault();
+                });
+                
+                if(env==1){
+                    //设置分享
+                    _wx.share1={
+                        title: '', // 分享标题
+                        desc: '',//分享摘要
+                        link: _wx.baseLink + 'index.html', // 分享链接
+                        imgUrl: _wx.baseLink + 'img/share.jpg', // 分享图标
+                        type: '', // 分享类型,music、video或link，不填默认为link
+                        dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+                        success: function () {
+                            //分享成功
+                            try{
+                            	MtaH5.clickShare('wechat_friend');
+                            }catch(e){}                       
+                        },
+                        cancel: function () {
+                            // 用户取消分享后执行的回调函数
+                        }
+                    };
+                    Object.assign(_wx.share2,_wx.share1);
+                    _wx.share2.success=function(){
+                    	try{
+                    		MtaH5.clickShare('wechat_moments');	
+                    	}catch(e){};    
+                    }
+                    _wx.init();
+                };
+
+                //音乐自动播放
+                // if (/MicroMessenger/i.test(navigator.userAgent.toLowerCase())) {
+                //     $(document).on("WeixinJSBridgeReady", function () {
+                //         xx.mp3 = xx.bgMp3();
+                //     });
+                // } else {
+                //     xx.mp3 = xx.bgMp3();
+                // }
+            }
+
+        })();
+    </script>
+</body>
+</html>
