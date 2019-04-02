@@ -14,7 +14,7 @@
         <div id="page_loading"><div></div><p id="loadNum">0%</p></div>
         <!--首页-->
         <div id="p1" class="page">
-            <div class="p1-img"><img _src="img/loading.png"/></div>
+            <div class="p1-img"><img data-src="img/loading.png"/></div>
             <div id="p1Btn" class="p1-btn">点击进入内页</div>
         </div>
         <div id="end" class="page">
@@ -97,7 +97,7 @@
             loadScript(scriptList, main,xx.cdn);
             function main() {
                 var imgLoader=new xx.ImgLoader();
-                imgLoader.loadType=['_src'];
+                imgLoader.loadType=['src'];
                 // imgLoader.crossOrigin="anonymous";
                 imgLoader.basePath=xx.cdn;
                 var oNum = $('#loadNum')[0];

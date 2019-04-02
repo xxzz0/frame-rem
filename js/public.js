@@ -175,15 +175,15 @@ xx.page={
     /**
      * @class ImgLoader 图片加载
      * @method load 开始加载
-     * @property {string} basePath  路径
+     * @method getImg 获取图片对象
+     * @property {string} basePath  基础路径
      * @property {string} crossOrigin 源
-     * @property {array} loadType 自定义路径名['_src','_src1','img/i1.jpg'……]
+     * @property {array} loadList 加载列表['src','src1','img/i1.jpg'……]；名称带 . 或 / 默认当成路径加载；其他值通过data-*获取元素加载，并且data-*不能含有- 和 大写字母
      * @property {number} time 单张图片最大加载时间
      * @property {function} onProgress 加载进度
      * @property {function} onComplete 加载完成
-     * @method getImg 获取图片对象
      */
-    function ImgLoader(){this.basePath="",this.crossOrigin="",this.loadType=["_src"],this.time=5e3,this.onProgress=function(){},this.onComplete=function(){},this._imgList={}}ImgLoader.prototype.isAp=function(t){return-1!=t.indexOf("//")},ImgLoader.prototype.load=function(){function t(){n++;var t=Math.ceil(n/r*100);e.onProgress(t),100!=t||s||(clearTimeout(o),e.onComplete())}var o,e=this,i=this._createQueue(this.loadType),r=i.length,n=0,s=!1,a=this.time;if(0==r)e.onComplete();else{o=setTimeout(function(){s=!0,e.onComplete()},a*r);for(var c=0;c<r;c++)this._loadOnce(i[c],t)}},ImgLoader.prototype._createQueue=function(t){for(var o=this,e=[],i=0;i<t.length;i++)if(/.jpg|.png|.gif/i.test(t[i])){var r=new Image;o.crossOrigin&&(r.crossOrigin=o.crossOrigin);var n=t[i];e.push({tag:r,src:o.isAp(n)?n:o.basePath+n}),o._imgList[n]=r}else{var s=$("img["+t[i]+"]");s.each(function(r,n){o.crossOrigin&&(n.crossOrigin=o.crossOrigin);var s=$(n).attr(t[i]);e.push({tag:n,src:o.isAp(s)?s:o.basePath+s}),o._imgList[s]=n})}return e},ImgLoader.prototype._loadOnce=function(t,o){var e=t.tag;e.src=t.src,e.complete?o():(e.onload=function(){e.onload=null,o()},e.onerror=function(){e.onerror=null,o()})},ImgLoader.prototype.getImg=function(t){return this._imgList[t]};
+    function ImgLoader(){this.basePath="",this.crossOrigin="",this.loadList=["src"],this.time=5e3,this.onProgress=function(){},this.onComplete=function(){},this._objList={}}ImgLoader.prototype.isAp=function(t){return-1!=t.indexOf("//")},ImgLoader.prototype.isPath=function(t){return!!/\.|\//i.test(t)},ImgLoader.prototype.load=function(){function t(){s++;var t=Math.ceil(s/i*100);e.onProgress(t),100!=t||n||(clearTimeout(o),e.onComplete())}var o,e=this,r=this._createQueue(this.loadList),i=r.length,s=0,n=!1,a=this.time;if(0==i)e.onComplete();else{o=setTimeout(function(){n=!0,e.onComplete()},a*i);for(var c=0;c<i;c++)this._loadOnce(r[c],t)}},ImgLoader.prototype._createQueue=function(t){for(var o=this,e=[],r=0;r<t.length;r++)if(o.isPath(t[r])){var i=new Image;o.crossOrigin&&(i.crossOrigin=o.crossOrigin);var s=t[r];e.push({tag:i,src:o.isAp(s)?s:o.basePath+s}),o._objList[s]=i}else for(var n=t[r],a=document.querySelectorAll("img[data-"+n+"]"),c=0;c<a.length;c++){var u=a[c];o.crossOrigin&&(u.crossOrigin=o.crossOrigin);var s=u.dataset[n];e.push({tag:u,src:o.isAp(s)?s:o.basePath+s}),o._objList[s]=u}return e},ImgLoader.prototype._loadOnce=function(t,o){var e=t.tag;e.src=t.src,e.complete?o():(e.onload=function(){e.onload=null,o()},e.onerror=function(){e.onerror=null,o()})},ImgLoader.prototype.getImg=function(t){return this._objList[t]};
     //############# API ####################
     xx.ImgLoader=ImgLoader;
 })();
@@ -194,7 +194,7 @@ xx.main=function(){
     //延迟加载图片
     var imgLoader2=new xx.ImgLoader();
     imgLoader2.basePath=xx.cdn;
-    imgLoader2.loadType=['_src0'];
+    imgLoader2.loadType=['src0'];
     imgLoader2.load();
 
     //进入页面
